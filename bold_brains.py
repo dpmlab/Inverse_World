@@ -139,10 +139,9 @@ def generate_brains():
 
 
 def transform_to_MNI():
-    filename = f'temp/subj_space/*'
     for subj in range(0,3):
+        filename = f'temp/subj_space/sub{subj+1}*'
         for file in glob.glob(filename):
-            print(file[27:])
             stem = Path(filename).stem
             resample = afni.Resample()
             resample.inputs.in_file = file
@@ -161,6 +160,7 @@ def transform_to_MNI():
             print(aw.cmdline)
             aw.run()
             os.remove(f'temp/temp/{stem}')
+
 
 def smooth_brains(output_dir):
     print("yay")
