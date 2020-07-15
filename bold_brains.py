@@ -1,19 +1,19 @@
-import warnings
-import sys
-if not sys.warnoptions:
-    warnings.simplefilter("ignore")
+# import warnings
+# import sys
+# if not sys.warnoptions:
+    # warnings.simplefilter("ignore")
 import os
 import glob
-from collections import defaultdict
+# from collections import defaultdict
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy import stats
-from sklearn.linear_model import SGDRegressor, Ridge, Lasso, ElasticNet
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import make_scorer
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score
+# from scipy import stats
+from sklearn.linear_model import Ridge
+# from sklearn.model_selection import GridSearchCV
+# from sklearn.metrics import make_scorer
+# from sklearn.model_selection import train_test_split
+# from sklearn.metrics import r2_score
 import nibabel as nib
 import re
 import pickle
@@ -134,7 +134,7 @@ def generate_brains():
 
             nib.save(nib.Nifti1Image(subj_brain, affine=T1_mask_nib.affine),
                      f'temp/subj_space/sub{subj+1}_{Path(filename).stem}.nii.gz')
-    print("Saved: Predictions into subjects' brains")
+    print(f"Saved: {subj+1}/3 predictions into subjects' brains")
     # Probably should save these for the future in a specific folder to this run, so don't do everything everytime
 
 
