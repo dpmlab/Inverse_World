@@ -44,9 +44,9 @@ def main():
         os.makedirs(directory, exist_ok=True)
 
     num_images = len(glob.glob(f"{args.input[0]}/*"))
-    # generate_activations(args.input[0])
-    # generate_brains()
-    # transform_to_MNI()
+    generate_activations(args.input[0])
+    generate_brains()
+    transform_to_MNI()
     smooth_brains(args.output, args.sigma)
     
 
