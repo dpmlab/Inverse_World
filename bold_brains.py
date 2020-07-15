@@ -82,6 +82,7 @@ def generate_activations(input_dir):
     print(f"Saved: CNN activations of {num_images} images")
 
 
+# TODO: simplify models, better way to do order files so fewer loads?
 def generate_brains():
     roi_list = ["EarlyVis","OPA", "LOC", "RSC", "PPA"]
     ridge_p_grid = {'alpha': np.logspace(1, 5, 10)}
@@ -94,7 +95,6 @@ def generate_brains():
 
 
     # subj_brains = np.zeros((num_images,), dtype=object)
-    
     for subj in range(0,3):
         for filename in glob.glob('temp/activations/*'):
             actv  = np.load(open(filename, 'rb'), allow_pickle=True)
@@ -161,7 +161,7 @@ def transform_to_MNI():
             aw.run()
             os.remove(f'temp/temp/{stem}')
 
-    print()
+    print("Saved: Brains in MNI space")
 
 
 def smooth_brains(output_dir):
