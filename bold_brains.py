@@ -6,7 +6,7 @@ import os
 import glob
 # from collections import defaultdict
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
 # from scipy import stats
 from sklearn.linear_model import Ridge
@@ -15,7 +15,7 @@ from sklearn.linear_model import Ridge
 # from sklearn.model_selection import train_test_split
 # from sklearn.metrics import r2_score
 import nibabel as nib
-import re
+# import re
 import pickle
 
 import matplotlib.pyplot as plt
@@ -44,10 +44,10 @@ def main():
         os.makedirs(directory, exist_ok=True)
 
     num_images = len(glob.glob(f"{args.input[0]}/*"))
-    generate_activations(args.input[0])
-    generate_brains()
-    transform_to_MNI()
-    smooth_brains(args.output)
+    # generate_activations(args.input[0])
+    # generate_brains()
+    # transform_to_MNI()
+    smooth_brains(args.output, args.sigma)
     
 
 
@@ -55,7 +55,7 @@ def generate_activations(input_dir):
     output = f"temp/activations/"
 
     # Default input image transformations for ImageNet
-    scaler = transforms.Scale((224, 224))
+    scaler = transforms.Resize((224, 224))
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
     to_tensor = transforms.ToTensor()
@@ -80,6 +80,7 @@ def generate_activations(input_dir):
 
     num_images = len(glob.glob(f"{input_dir}/*"))
     print(f"Saved: CNN activations of {num_images} images")
+
 
 
 # TODO: simplify models, better way to do order files so fewer loads?
@@ -134,7 +135,7 @@ def generate_brains():
 
             nib.save(nib.Nifti1Image(subj_brain, affine=T1_mask_nib.affine),
                      f'temp/subj_space/sub{subj+1}_{Path(filename).stem}.nii.gz')
-    print(f"Saved: {subj+1}/3 predictions into subjects' brains")
+    print(f"Saved: Predictions into subjects' brains")
     # Probably should save these for the future in a specific folder to this run, so don't do everything everytime
 
 
@@ -164,9 +165,39 @@ def transform_to_MNI():
     print("Saved: Brains in MNI space")
 
 
-def smooth_brains(output_dir):
-    print("yay")
-    return
+def smooth_brains(output_dir, sig):
+
+    # for sig, sigval in [1, 2.547987, 5][:1]):
+    # print(output_dir, sig)
+#     filename = f"temp/mni/*"
+#     for file in glob.glob(filename):
+#         stem = Path(file).stem
+#         new = f"{output_dir}/{stem}.gz"
+# #         print(new)
+#         ! fslmaths $bm -kernel gauss $sigval -fmean $new
+#     for subj in range(0,3):
+#         filename = f'temp/subj_space/sub{subj+1}*'
+#         for file in glob.glob(filename):
+#             stem = Path(file).stem
+#             resample = afni.Resample()
+#             resample.inputs.in_file = file
+#             resample.inputs.master = f'derivatives/T1/sub-CSI{subj+1}_ses-16_anat_sub-CSI{subj+1}_ses-16_T1w.nii.gz'
+#             resample.inputs.out_file = f'temp/temp/{stem}'
+#             # print(resample.cmdline)
+#             resample.run()
+
+#             aw = fsl.ApplyWarp()
+#             aw.inputs.in_file = f'temp/temp/{stem}'
+#             aw.inputs.ref_file = f'derivatives/sub{subj+1}.anat/T1_to_MNI_nonlin.nii.gz'
+#             aw.inputs.field_file = f'derivatives/sub{subj+1}.anat/T1_to_MNI_nonlin_coeff.nii.gz'
+#             aw.inputs.premat = f'derivatives/sub{subj+1}.anat/T1_nonroi2roi.mat'
+#             aw.inputs.interp = 'nn'
+#             aw.inputs.out_file = f'temp/mni/{stem}.gz' # Note: stem here contains '*.nii'
+#             # print(aw.cmdline)
+#             aw.run()
+#             os.remove(f'temp/temp/{stem}')
+
+    print("Saved: Brains in MNI space")   
 
 # def load_activations(load_location):
 #     load_counter = 0
@@ -195,7 +226,7 @@ def get_args():
 
 def dir_path(string):
     if os.path.isdir(string):
-        return string
+        return Path(string).resolve()
     else:
         raise NotADirectoryError(string)
 
