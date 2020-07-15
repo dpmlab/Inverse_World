@@ -146,7 +146,7 @@ def transform_to_MNI():
             stem = Path(filename).stem
             resample = afni.Resample()
             resample.inputs.in_file = file
-            resample.inputs.master = f'derivatives/T1/sub-CSI{subj+1}_ses-16_anat_sub-CSI{subj+1}_ses-16_T1w.nii'
+            resample.inputs.master = f'derivatives/T1/sub-CSI{subj+1}_ses-16_anat_sub-CSI{subj+1}_ses-16_T1w.nii.gz'
             resample.inputs.out_file = f'temp/temp/{stem}'
             print(resample.cmdline)
             resample.run()
