@@ -139,6 +139,7 @@ def generate_brains():
     # Probably should save these for the future in a specific folder to this run, so don't do everything everytime
 
 
+
 def transform_to_MNI():
     for subj in range(0,3):
         filename = f'temp/subj_space/sub{subj+1}*'
@@ -161,58 +162,26 @@ def transform_to_MNI():
             # print(aw.cmdline)
             aw.run()
             os.remove(f'temp/temp/{stem}')
-
     print("Saved: Brains in MNI space")
+
 
 
 def smooth_brains(output_dir, sig):
 
-    # for sig, sigval in [1, 2.547987, 5][:1]):
-    # print(output_dir, sig)
-#     filename = f"temp/mni/*"
-#     for file in glob.glob(filename):
-#         stem = Path(file).stem
-#         new = f"{output_dir}/{stem}.gz"
-# #         print(new)
+    filename = f"temp/mni/*"
+    for file in glob.glob(filename):
+        stem = Path(file).stem
+        out = f"{output_dir}/{stem}.gz"
+        smooth = fsl.IsotropicSmooth()
+        smooth.inputs.in_file = file
+        smooth.inputs.sigma = sig
+        smooth.inputs.out_file = out
+        smooth.run()
 #         ! fslmaths $bm -kernel gauss $sigval -fmean $new
-#     for subj in range(0,3):
-#         filename = f'temp/subj_space/sub{subj+1}*'
-#         for file in glob.glob(filename):
-#             stem = Path(file).stem
-#             resample = afni.Resample()
-#             resample.inputs.in_file = file
-#             resample.inputs.master = f'derivatives/T1/sub-CSI{subj+1}_ses-16_anat_sub-CSI{subj+1}_ses-16_T1w.nii.gz'
-#             resample.inputs.out_file = f'temp/temp/{stem}'
-#             # print(resample.cmdline)
-#             resample.run()
+    print("Saved: Smoothed MNI brains")   
 
-#             aw = fsl.ApplyWarp()
-#             aw.inputs.in_file = f'temp/temp/{stem}'
-#             aw.inputs.ref_file = f'derivatives/sub{subj+1}.anat/T1_to_MNI_nonlin.nii.gz'
-#             aw.inputs.field_file = f'derivatives/sub{subj+1}.anat/T1_to_MNI_nonlin_coeff.nii.gz'
-#             aw.inputs.premat = f'derivatives/sub{subj+1}.anat/T1_nonroi2roi.mat'
-#             aw.inputs.interp = 'nn'
-#             aw.inputs.out_file = f'temp/mni/{stem}.gz' # Note: stem here contains '*.nii'
-#             # print(aw.cmdline)
-#             aw.run()
-#             os.remove(f'temp/temp/{stem}')
 
-    print("Saved: Brains in MNI space")   
 
-# def load_activations(load_location):
-#     load_counter = 0
-#     layer_actv = []
-    
-#     for image_idx in range(1,157):
-#         for filename in glob.glob(f"{"{0:0=3d}".format(image_idx)}.jpg.npy"):
-#             layer_actv.append(np.load(filename, allow_pickle = True))
-#             load_counter += 1
-#             if load_counter % 500 == 0: print("Loaded:", load_counter)
-
-#     print(f"Loaded: {load_counter}\n Loading layers complete")
-    
-#     return layer_actv
-            
 def get_args():
     parser = argparse.ArgumentParser(description='Convert images into MNI brains.')
     parser.add_argument('--input', metavar='input_dir', type=dir_path, required=True, nargs=1,
@@ -223,6 +192,7 @@ def get_args():
                         help='sigma for smoothing MNI brains')
 
     return parser.parse_args()   
+
 
 def dir_path(string):
     if os.path.isdir(string):
