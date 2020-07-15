@@ -1,27 +1,9 @@
-# import warnings
-# import sys
-# if not sys.warnoptions:
-    # warnings.simplefilter("ignore")
-import os
-import glob
-# from collections import defaultdict
-
-# import matplotlib.pyplot as plt
 import numpy as np
-# from scipy import stats
+import matplotlib.pyplot as plt
 from sklearn.linear_model import Ridge
-# from sklearn.model_selection import GridSearchCV
-# from sklearn.metrics import make_scorer
-# from sklearn.model_selection import train_test_split
-# from sklearn.metrics import r2_score
-import nibabel as nib
-# import re
 import pickle
 
-import matplotlib.pyplot as plt
-
 import torch
-# import torch.nn as nn
 import torchvision.models as models
 import torchvision.transforms as transforms
 from torch.autograd import Variable
@@ -29,8 +11,10 @@ from PIL import Image
 
 from pathlib import Path
 import argparse
+import os
+import glob
 
-import pandas as pd
+import nibabel as nib
 from nipype.interfaces import afni
 from nipype.interfaces import fsl
 
@@ -87,18 +71,17 @@ def generate_activations(input_dir):
 def generate_brains():
     roi_list = ["EarlyVis","OPA", "LOC", "RSC", "PPA"]
     ridge_p_grid = {'alpha': np.logspace(1, 5, 10)}
-    # print(f"Param Grid: {[i for i in ridge_p_grid['alpha']]}")
-    # bold = np.load('bold5000_subj_data.pkl', allow_pickle=True)
 
     model_dir = f"models/"
     shape_array = np.load('derivatives/shape_array.npy', allow_pickle=True)
     random_state = 3
 
 
-    # subj_brains = np.zeros((num_images,), dtype=object)
+    # For each subject, for each input file, predict all ROIs for that subject and save prediction
     for subj in range(0,3):
         for filename in glob.glob('temp/activations/*'):
             actv  = np.load(open(filename, 'rb'), allow_pickle=True)
+
             for roi_idx, roi in enumerate(range(0,5)): # All ROIs
                 model = pickle.load(open(f'models/subj{subj+1}_{roi_list[roi]}_model.pkl', 'rb'))
                 y_pred_brain = model.predict([actv])
@@ -121,13 +104,13 @@ def generate_brains():
                     subj_brain = np.empty(T1_mask_shape)
                     subj_brain[:, :, :] = np.NaN  
 
-                # LH
+                # LH Nanmean
                 a = np.array([subj_brain[LH_T1_mask], 
                               brain[:int(shape_array[subj][roi][0])]]) # nanmean of new with existing
                 a = np.nanmean(a, axis=0)
                 subj_brain[LH_T1_mask] = a # Hopefully the length of your vector = T1_mask.sum()
 
-                # RH
+                # RH Nanmean
                 a = np.array([subj_brain[RH_T1_mask],
                               brain[int(shape_array[subj][roi][0]):]])
                 a = np.nanmean(a, axis=0)
@@ -167,7 +150,6 @@ def transform_to_MNI():
 
 
 def smooth_brains(output_dir, sig):
-
     filename = f"temp/mni/*"
     for file in glob.glob(filename):
         stem = Path(file).stem
