@@ -142,7 +142,7 @@ def transform_to_MNI():
     for subj in range(0,3):
         filename = f'temp/subj_space/sub{subj+1}*'
         for file in glob.glob(filename):
-            stem = Path(filename).stem
+            stem = Path(file).stem
             resample = afni.Resample()
             resample.inputs.in_file = file
             resample.inputs.master = f'derivatives/T1/sub-CSI{subj+1}_ses-16_anat_sub-CSI{subj+1}_ses-16_T1w.nii.gz'
@@ -160,6 +160,8 @@ def transform_to_MNI():
             print(aw.cmdline)
             aw.run()
             os.remove(f'temp/temp/{stem}')
+
+    print()
 
 
 def smooth_brains(output_dir):
