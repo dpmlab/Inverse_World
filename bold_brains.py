@@ -147,7 +147,7 @@ def transform_to_MNI():
             resample.inputs.in_file = file
             resample.inputs.master = f'derivatives/T1/sub-CSI{subj+1}_ses-16_anat_sub-CSI{subj+1}_ses-16_T1w.nii.gz'
             resample.inputs.out_file = f'temp/temp/{stem}'
-            print(resample.cmdline)
+            # print(resample.cmdline)
             resample.run()
 
             aw = fsl.ApplyWarp()
@@ -157,7 +157,7 @@ def transform_to_MNI():
             aw.inputs.premat = f'derivatives/sub{subj+1}.anat/T1_nonroi2roi.mat'
             aw.inputs.interp = 'nn'
             aw.inputs.out_file = f'temp/mni/{stem}.gz' # Note: stem here contains '*.nii'
-            print(aw.cmdline)
+            # print(aw.cmdline)
             aw.run()
             os.remove(f'temp/temp/{stem}')
 
