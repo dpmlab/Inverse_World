@@ -156,7 +156,7 @@ def transform_to_MNI():
             aw.inputs.field_file = f'derivatives/sub{subj+1}.anat/T1_to_MNI_nonlin_coeff.nii.gz'
             aw.inputs.premat = f'derivatives/sub{subj+1}.anat/T1_nonroi2roi.mat'
             aw.inputs.interp = 'nn'
-            aw.inputs.out_file = f'temp/mni/{stem}.nii.gz'
+            aw.inputs.out_file = f'temp/mni/{stem}.gz' # Note: stem here contains '*.nii'
             print(aw.cmdline)
             aw.run()
             os.remove(f'temp/temp/{stem}')
