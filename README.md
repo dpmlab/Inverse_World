@@ -6,6 +6,5 @@ usage: python bold_brains.py [-h] --input input_dir [--output output_dir]
                       [--sigma sigma]
 
 
-After AFNI installation, to reduce output: 
-
+After AFNI installation, to reduce output: \n
 $ echo "AFNI_NIFTI_TYPE_WARN = NO" >> ~/.afnirc
