@@ -34,6 +34,7 @@ def main():
     for directory in temp_dirs:
         os.makedirs(directory, exist_ok=True)
 
+
     global num_images, input_dir, output_dir
     num_images = len(glob.glob(f"{args.input[0]}/*"))
     input_dir = args.input[0]
@@ -96,9 +97,10 @@ def generate_brains():
     for subj in range(0,3):
         for filename in glob.glob('temp/activations/*'):
             actv  = np.load(open(filename, 'rb'), allow_pickle=True)
-            for roi_idx, roi in enumerate(range(2,5)): # Only generating for LOC, RSC, PPA
+            for roi_idx, roi in enumerate(range(0,5)): # Only generating for LOC, RSC, PPA
 
                 model = pickle.load(open(f'models/subj{subj+1}_{roi_list[roi]}_model.pkl', 'rb'))
+                pickle.dump(model, open(f'models/subj{subj+1}_{roi_list[roi]}_model.pkl', 'wb'))
                 y_pred_brain = model.predict([actv])
                 brain = y_pred_brain[0]
 
@@ -203,7 +205,7 @@ def average_subj_brains(input_dir, output_dir):
 def compute_correlations(true_dir):
     sorted_output = [Path(i).stem for i in natsorted(glob.glob(f'{output_dir}/*'))]
     sorted_true   = [Path(i).stem for i in natsorted(glob.glob(f'{true_dir}/*'))]
-    print(sorted_output[:10], sorted_true[:10])
+    # print(sorted_output[:10], sorted_true[:10])
     assert(len(sorted_output) == len(sorted_true))
 
     threshold = 0.15 # threshold for smoothed bool mask
@@ -238,15 +240,15 @@ def compute_ranking():
     ranked = np.empty((num_images))
 
     for i in range(num_images):
-        sort_r = {'r':corr[st, i, :], 'col': [z for z in range(156)]}
+        sort_r = {'r':corr[i, :], 'col': [z for z in range(156)]}
 
         sort_r = pd.DataFrame(sort_r).sort_values(by='r', ascending=False)
         sort_r['default_rank'] = sort_r['r'].rank(ascending=False)
 
         ranked[i] = sort_r.loc[i, 'default_rank']
 
-    print(f"Average ranking of predicted to true brain:"
-          f"{np.mean(ranked, axis=0)*100/num_images} / 50.5")
+    print(f"Average ranking of predicted to true brain: " +
+          "{:.3f}".format(np.mean(ranked, axis=0)*100/num_images) + " / 50.5")
 
 
 
@@ -263,7 +265,6 @@ def frame_by_frame_correlation(input_dir, output_dir):
 
         corr[i] = stats.pearsonr(first[overlap], second[overlap])[0] #just get r, not p val
 
-
     plt.figure(figsize=(15, 2))
     plt.title('frame by frame correlation for Partly Cloudy')
     plt.xlabel('TR')
@@ -271,6 +272,7 @@ def frame_by_frame_correlation(input_dir, output_dir):
     plt.imshow([corr], cmap='viridis', aspect='auto')
     plt.colorbar(orientation="horizontal",)
     plt.show()
+
 
 
 def get_subj_overlap(rois):
@@ -289,6 +291,7 @@ def get_subj_overlap(rois):
     return overlap
 
 
+
 def get_args():
     parser = argparse.ArgumentParser(description='Convert images into MNI brains.')
     parser.add_argument('--input', metavar='input_dir', type=dir_path, required=True, nargs=1,
@@ -303,11 +306,13 @@ def get_args():
     return parser.parse_args()   
 
 
+
 def dir_path(string):
     if os.path.isdir(string):
         return Path(string).resolve()
     else:
         raise NotADirectoryError(string)
+
 
 if __name__ == '__main__':
     main()
