@@ -266,15 +266,15 @@ def frame_by_frame_correlation(input_dir, output_dir):
 
             corr[i, j] = stats.pearsonr(first[overlap], second[overlap])[0] #just get r, not p val
 
+    pkl_filename = f"temp/frame_by_frame_corr_matrix.pkl"
+    pickle.dump(corr, open(pkl_filename, 'wb'))
     plt.figure(figsize=(15, 2))
     plt.title('frame by frame correlation for Partly Cloudy')
     plt.xlabel('TR')
     plt.ylabel('')
-    plt.imshow([corr], cmap='viridis', aspect='auto')
+    plt.imshow(corr, cmap='viridis', aspect='auto')
     plt.colorbar(orientation="horizontal",)
     plt.show()
-    pkl_filename = f"temp/frame_by_frame_corr_matrix.pkl"
-    pickle.dump(corr, open(pkl_filename, 'wb'))
 
 
 
