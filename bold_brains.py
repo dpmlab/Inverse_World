@@ -40,16 +40,16 @@ def main():
     input_dir = args.input[0]
     output_dir = args.output
 
-    generate_activations(args.input[0])
-    generate_brains()
-    transform_to_MNI()
-    smooth_brains(args.sigma)
-    average_subj_brains(args.input[0], args.output)
+    # generate_activations(args.input[0])
+    # generate_brains()
+    # transform_to_MNI()
+    # smooth_brains(args.sigma)
+    # average_subj_brains(args.input[0], args.output)
 
     if (args.true != None):
-        compute_correlations(args.true)
-        compute_ranking()
-        # frame_by_frame_correlation(args.input[0], args.output)
+        # compute_correlations(args.true)
+        # compute_ranking()
+        frame_by_frame_correlation(args.input[0], args.output)
     
 
 
@@ -258,12 +258,13 @@ def frame_by_frame_correlation(input_dir, output_dir):
     sorted_input = [Path(i).stem for i in natsorted(directory)]
 
     overlap = get_subj_overlap(['LOC', 'PPA', 'RSC'])
-    corr = np.zeros((num_images - 1))
-    for i in range(num_images - 1):
-        first  = nib.load(f'{output_dir}/{sorted_input[i]}.nii.gz').get_fdata()
-        second = nib.load(f'{output_dir}/{sorted_input[i + 1]}.nii.gz').get_fdata()
+    corr = np.zeros((num_images, num_images))
+    for i in range(num_images):
+        for j in range(num_images):
+            first  = nib.load(f'{output_dir}/{sorted_input[i]}.nii.gz').get_fdata()
+            second = nib.load(f'{output_dir}/{sorted_input[j]}.nii.gz').get_fdata()
 
-        corr[i] = stats.pearsonr(first[overlap], second[overlap])[0] #just get r, not p val
+            corr[i, j] = stats.pearsonr(first[overlap], second[overlap])[0] #just get r, not p val
 
     plt.figure(figsize=(15, 2))
     plt.title('frame by frame correlation for Partly Cloudy')
@@ -272,6 +273,8 @@ def frame_by_frame_correlation(input_dir, output_dir):
     plt.imshow([corr], cmap='viridis', aspect='auto')
     plt.colorbar(orientation="horizontal",)
     plt.show()
+    pkl_filename = f"temp/frame_by_frame_corr_matrix.pkl"
+    pickle.dump(corr, open(pkl_filename, 'wb'))
 
 
 
