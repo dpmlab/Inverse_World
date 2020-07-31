@@ -32,7 +32,11 @@ def main():
     temp_dirs = ['temp/activations', 'temp/subj_space', 
                  'temp/temp', 'temp/mni', 'temp/mni_s']
     for directory in temp_dirs:
-        os.makedirs(directory, exist_ok=True)
+        try:
+            os.makedirs(directory)
+        except FileExistsError as e:
+            for f in glob.glob(f"{directory}/*"):
+                os.remove(f)
 
 
     global num_images, input_dir, output_dir
@@ -84,7 +88,6 @@ def generate_activations(input_dir):
 
 
 
-# TODO: simplify models, better way to do order files so fewer loads?
 def generate_brains():
     roi_list = ["EarlyVis","OPA", "LOC", "RSC", "PPA"]
     ridge_p_grid = {'alpha': np.logspace(1, 5, 10)}
@@ -133,7 +136,7 @@ def generate_brains():
 
             nib.save(nib.Nifti1Image(subj_brain, affine=T1_mask_nib.affine),
                      f'temp/subj_space/sub{subj+1}_{Path(filename).stem}.nii.gz')
-    print(f"Saved: Predictions into subjects' brains")
+    print(f"Saved: Predictions into subject's brains")
     # Probably should save these for the future in a specific folder to this run, so don't do 
     # everything everytime
 
@@ -247,7 +250,8 @@ def compute_ranking():
         ranked[i] = sort_r.loc[i, 'default_rank']
 
     print(f"Average ranking of predicted to true brain: " +
-          "{:.3f}".format(np.mean(ranked, axis=0)*100/num_images) + " / 50.5")
+          "{:.3f}".format(np.mean(ranked, axis=0)/num_images) + 
+          " / {:.3f}".format((num_images+1)/(2*num_images)))
 
 
 def get_subj_overlap(rois):
