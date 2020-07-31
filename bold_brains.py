@@ -250,8 +250,8 @@ def compute_ranking():
         ranked[i] = sort_r.loc[i, 'default_rank']
 
     print(f"Average ranking of predicted to true brain: " +
-          "{:.3f}".format(np.mean(ranked, axis=0)/num_images) + 
-          " / {:.3f}".format((num_images+1)/(2*num_images)))
+          "{:.3f}".format(np.mean(ranked, axis=0)/(num_images+1)) + 
+          " chance: {:.3f}".format((num_images+1)/(2*(num_images+1))))
 
 
 def get_subj_overlap(rois):
