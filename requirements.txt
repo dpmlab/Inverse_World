@@ -11,7 +11,7 @@ idna==2.10
 isodate==0.6.0
 joblib==0.16.0
 kiwisolver==1.2.0
-lxml==4.5.2
+lxml==4.6.2
 matplotlib==3.3.0
 natsort==7.0.1
 networkx==2.4
